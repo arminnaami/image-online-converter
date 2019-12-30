@@ -31,3 +31,7 @@ Image online converter using imagemagick &amp; jpegoptim
     [Path] /image/?/photos/photo.jpg
     [Generated file] /image/co/http%3A%2F%2Fwebsite.co.jp%2Fphotos%2Fphoto.jpg
 
+## References
+
+* https://imagemagick.org/
+* https://github.com/tjko/jpegoptim
