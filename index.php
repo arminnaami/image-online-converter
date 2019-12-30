@@ -34,11 +34,11 @@ $url = preg_replace('/\.\./','',$url);
 ## add host name if the url doesn't have any domain (host) 
 $url_info = parse_url($url);
 if ( empty($url_info['host']) ) {
-	$url = (empty($_SERVER['HTTPS']) ? 'http://' : 'https://') .  $_SERVER['HTTP_HOST'] . $url;
+    $url = (empty($_SERVER['HTTPS']) ? 'http://' : 'https://') .  $_SERVER['HTTP_HOST'] . $url;
 }
 ## domain filter
 if ( !empty($url_info['host']) && !is_available_domain( $url_info['host'] ) ) {
-	exit(1);
+    exit(1);
 }
 
 $encoded_url = urlencode($url);
@@ -74,68 +74,68 @@ if( file_exists($co_file) ) {
 
 ## original image download
 if( !file_exists($ca_file) ){
-	exec("wget --no-check-certificate -q {$url} -O {$ca_file}", $out, $ret);
-	if ($ret == 1) { print implode('',$out); exit(1); }
+    exec("wget --no-check-certificate -q {$url} -O {$ca_file}", $out, $ret);
+    if ($ret == 1) { print implode('',$out); exit(1); }
 }
 
 $pathinfo = pathinfo($ca_file);
 $ext = strtolower($pathinfo['extension']);
 
 if ( $ext == 'bmp' || $ext == 'jpg' || $ext == 'jpeg' ) {
-	## convert (bmp => jpg)
-	if( $ext == 'bmp' ){
-		$jpg_path =  $dir . $ca_dir . $pathinfo['filename'] . '.jpg';
-		if( !file_exists($jpg_path) ||is_expired_file($jpg_path) ){
-			exec("convert \"{$ca_file}\" {$jpg_path}", $out, $ret);
-	        if ($ret == 1) { print implode('',$out); exit(1); }
-		}
-		$encoded_url = $pathinfo['filename'] . '.jpg';
-		$ca_file = $dir . $ca_dir . $encoded_url;
-		$co_file = $dir . $co_dir . $encoded_url;
-	}
+    ## convert (bmp => jpg)
+    if( $ext == 'bmp' ){
+        $jpg_path =  $dir . $ca_dir . $pathinfo['filename'] . '.jpg';
+        if( !file_exists($jpg_path) ||is_expired_file($jpg_path) ){
+            exec("convert \"{$ca_file}\" {$jpg_path}", $out, $ret);
+            if ($ret == 1) { print implode('',$out); exit(1); }
+        }
+        $encoded_url = $pathinfo['filename'] . '.jpg';
+        $ca_file = $dir . $ca_dir . $encoded_url;
+        $co_file = $dir . $co_dir . $encoded_url;
+    }
 
-	## resize
-	if( !empty($_GET['w']) && !empty($_GET['h']) && is_numeric($_GET['w']) && is_numeric($_GET['h']) ){
-		$w = $_GET['w'];	
-		$h = $_GET['h'];	
-		$resized_img_path =  $dir . $re_dir . $pathinfo['filename'] .'_'. $w .'x'. $h .'.jpg';
-		if( !file_exists($resized_img_path) || is_expired_file($resized_img_path) ) {
-			exec("convert -geometry {$w}x{$h} \"{$ca_file}\" {$resized_img_path}", $out, $ret);
-			if ($ret == 1) { print implode('',$out); exit(1); }
-		}
-		$encoded_url = $pathinfo['filename'] .'_'. $w .'x'. $h .'.jpg';
-		$ca_file = $dir . $re_dir . $encoded_url;
-		$co_file = $dir . $co_dir . $encoded_url;
-	}
+    ## resize
+    if( !empty($_GET['w']) && !empty($_GET['h']) && is_numeric($_GET['w']) && is_numeric($_GET['h']) ){
+        $w = $_GET['w'];    
+        $h = $_GET['h'];    
+        $resized_img_path =  $dir . $re_dir . $pathinfo['filename'] .'_'. $w .'x'. $h .'.jpg';
+        if( !file_exists($resized_img_path) || is_expired_file($resized_img_path) ) {
+            exec("convert -geometry {$w}x{$h} \"{$ca_file}\" {$resized_img_path}", $out, $ret);
+            if ($ret == 1) { print implode('',$out); exit(1); }
+        }
+        $encoded_url = $pathinfo['filename'] .'_'. $w .'x'. $h .'.jpg';
+        $ca_file = $dir . $re_dir . $encoded_url;
+        $co_file = $dir . $co_dir . $encoded_url;
+    }
 
-	## compress (jpg)
-	if( !file_exists($co_file) || is_expired_file($co_file) ) {
-		exec("jpegoptim --strip-all -o -m30 \"{$ca_file}\" --dest={$dir}{$co_dir}", $out, $ret);
-		if ($ret == 1) { print implode('',$out); exit(1); }
-	}
+    ## compress (jpg)
+    if( !file_exists($co_file) || is_expired_file($co_file) ) {
+        exec("jpegoptim --strip-all -o -m30 \"{$ca_file}\" --dest={$dir}{$co_dir}", $out, $ret);
+        if ($ret == 1) { print implode('',$out); exit(1); }
+    }
 }else if ( $ext == 'png' ){
-	## resize
-	if( !empty($_GET['w']) && !empty($_GET['h']) && is_numeric($_GET['w']) && is_numeric($_GET['h']) ){
-		$w = $_GET['w'];	
-		$h = $_GET['h'];	
-		$resized_img_path =  $dir . $re_dir . $pathinfo['filename'] .'_'. $w .'x'. $h .'.png';
-		if( !file_exists($resized_img_path) || is_expired_file($resized_img_path) ) {
-			exec("convert -geometry {$w}x{$h} \"{$ca_file}\" {$resized_img_path}", $out, $ret);
-		    if ($ret == 1) { print implode('',$out); exit(1); }
-		}
-		$encoded_url = $pathinfo['filename'] .'_'. $w .'x'. $h .'.png';
-		$ca_file = $dir . $re_dir . $encoded_url;
-		$co_file = $dir . $co_dir . $encoded_url;
-	}
-	## compress (png)
-	if( !file_exists($co_file) || is_expired_file($co_file) ) {
-		exec("cp \"{$ca_file}\" \"{$co_file}\" && optipng -q -o7 \"{$co_file}\"", $out, $ret);
-	    if ($ret == 1) { print implode('',$out); exit(1); }
-	}
+    ## resize
+    if( !empty($_GET['w']) && !empty($_GET['h']) && is_numeric($_GET['w']) && is_numeric($_GET['h']) ){
+        $w = $_GET['w'];    
+        $h = $_GET['h'];    
+        $resized_img_path =  $dir . $re_dir . $pathinfo['filename'] .'_'. $w .'x'. $h .'.png';
+        if( !file_exists($resized_img_path) || is_expired_file($resized_img_path) ) {
+            exec("convert -geometry {$w}x{$h} \"{$ca_file}\" {$resized_img_path}", $out, $ret);
+            if ($ret == 1) { print implode('',$out); exit(1); }
+        }
+        $encoded_url = $pathinfo['filename'] .'_'. $w .'x'. $h .'.png';
+        $ca_file = $dir . $re_dir . $encoded_url;
+        $co_file = $dir . $co_dir . $encoded_url;
+    }
+    ## compress (png)
+    if( !file_exists($co_file) || is_expired_file($co_file) ) {
+        exec("cp \"{$ca_file}\" \"{$co_file}\" && optipng -q -o7 \"{$co_file}\"", $out, $ret);
+        if ($ret == 1) { print implode('',$out); exit(1); }
+    }
 }else{
-	## gif etc. => do nothing
-	header('Location: ' . $url );
-	exit;
+    ## gif etc. => do nothing
+    header('Location: ' . $url );
+    exit;
 }
 
 $co_file_info = getimagesize( $co_file );
@@ -164,12 +164,12 @@ function is_expired_file( $filepath ){
     # 1 day    = 86400 seconds
     # 7 days   = 604800 seconds
     # 30 days  = 2592000 seconds
-	$extention_time = 2592000; 
-	return ( ( mktime() - filemtime($filepath) ) > $extention_time ) ? true : false;
+    $extention_time = 2592000; 
+    return ( ( mktime() - filemtime($filepath) ) > $extention_time ) ? true : false;
 }
 
 function build_co_file_name($encoded_url, $w=null, $h=null){
-	if( !empty($w) && !empty($h) && is_numeric($w) && is_numeric($h) ){
+    if( !empty($w) && !empty($h) && is_numeric($w) && is_numeric($h) ){
         $pathinfo = pathinfo($encoded_url);
         $ext = strtolower($pathinfo['extension']);
         return $pathinfo['filename'] .'_'. $w .'x'. $h .'.'. $ext;
