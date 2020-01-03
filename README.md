@@ -7,7 +7,7 @@ Image online converter using imagemagick &amp; jpegoptim
 
 ## Package  requirements
 
-    sudo apt install php imagemagick jpegoptim
+    sudo apt install php imagemagick jpegoptim wget
 
 ## Example
 
