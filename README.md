@@ -13,7 +13,7 @@ Image online converter using imagemagick &amp; jpegoptim
 
 ### BMP => JPG convert & compression
 
-    [Path]] /image/?http://website.co.jp/Picrure.bmp
+    [Path] /image/?http://website.co.jp/Picrure.bmp
     [Generated file] /image/co/http%253A%252F%252Fwebsite.co.jp%252FPicture.jpg
 
 ### JPG compression
